@@ -110,18 +110,18 @@ verbose = 0
 opts,args = getopt.getopt(sys.argv[1:],"hvi:")
 for opt, arg in opts:
   if opt in ['-h']:
-    print("temple-run-gen.py [-h][-v][-i ifile]")
+    print("temple-hunt-gen.py [-h][-v][-i ifile]")
     exit()
   elif opt in ['-v']:
     verbose = 1
   elif opt in ['-i']:
     fnamein = arg
-    print("temple-run-gen.py: processing file",fnamein)
+    print("temple-hunt-gen.py: processing file",fnamein)
 
 # Proces file 
 
 fin = open(fnamein,"r")
-fout= open("temple-run-play.py","w")
+fout= open("temple-hunt-play.py","w")
 
 print_header()
 print_functions()
