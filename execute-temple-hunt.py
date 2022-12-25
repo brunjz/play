@@ -1,4 +1,4 @@
 #!/bin/csh
 
-bin/temple-hunt-gen.py -i temple-hunt.in
-./temple-hunt-play.py
+bin/temple-run-gen.py -i temple-run.in
+./temple-run-auto.py
