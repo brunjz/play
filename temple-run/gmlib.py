@@ -8,21 +8,37 @@ import random
 from pygame.locals import *
 from gmsequences import gm_seq_init
 from settings import Settings
+from os.path import exists
+
+#----------------------------------------------------------------- 
+# class Sequence
+class Sequence():
+
+  def __init__(self,id):
+    self.id = id
+    self.msg = ''
+    self.method = 'uinput'
+    self.rmax = 2
+    self.next = {}
+    self.img = 'images/default.jpg'
 
 
 #----------------------------------------------------------------- 
+# Overall class to manage game assets and behavior
 class SequenceManager:
-  """Overall class to manage game assets and behavior."""
 
+
+  #--------------------------------------------------------------- 
+  # Initialize the game, and create game resources
   def __init__(self):
-    """Initialize the game, and create game resources."""
+
     pygame.init()
 
-    self.cid = 's001' 
-
     # Initiate games sequences
+    self.cid = 's001' 
     self.list = [] 
     gm_seq_init(self.list)
+    self.check_list(self.list)
 
     # Display init 
     self.settings = Settings()
@@ -36,12 +52,15 @@ class SequenceManager:
     self.font = pygame.freetype.SysFont("comicsansms", 0) 
 
 
-  def chunkstring(self, string, length):
-    """ Breaks a long string into smaller strings. """
+  #--------------------------------------------------------------- 
+  # Breaks a long string into smaller strings
+  def chunkstring (self, string, length):
     return (string[0+i:length+i] for i in range(0, len(string), length))
 
 
-  def draw_text(self, text, text_size, color):
+  #--------------------------------------------------------------- 
+  # Draw text at the bottom of the screen 
+  def draw_text (self, text, text_size, color):
     """Draw text in the middle of the screen."""
 
     text_rect = self.font.get_rect(text,size=text_size)
@@ -49,7 +68,10 @@ class SequenceManager:
     self.font.render_to(self.screen,text_rect,text,color,size=text_size)  
 
 
-  def draw_text_lg(self, text, text_size, color):
+  #--------------------------------------------------------------- 
+  # Draw text at the bottom of the screen, breaking down long text 
+  # message into small strings.
+  def draw_text_lg (self, text, text_size, color):
     """Draw text in the middle of the screen."""
 
     mylist = []
@@ -65,7 +87,30 @@ class SequenceManager:
       self.font.render_to(self.screen, text_rect2, text2, color, size=text_size)  
       num += 1
 
+  #--------------------------------------------------------------- 
+  # Check validity of the elements in the sequence list
+  def check_list(self, list):
 
+    for seq in list:
+
+      if (len(seq.next) != 2 and len(seq.next) != 3): 
+        print(f"check_list: invalid entries in dictionary for seq {seq.id}, exiting")
+        sys.exit()
+
+      if (not exists(seq.img)): 
+        print(f"check_list: warning, {seq.img} not found for seq {seq.id}")
+
+      if (seq.method == ''): 
+        print(f"check_list: error, method not defined for seq {seq.id}, exiting")
+        sys.exit()
+
+      if (seq.rmax < 2): 
+        print(f"check_list: error, incorrect rmax value for seq {seq.id}, exiting")
+        sys.exit()
+
+
+  #--------------------------------------------------------------- 
+  # Routine to start the main game 
   def run_game(self):
       """Start the main loop for the game."""
 
@@ -163,28 +208,9 @@ class SequenceManager:
           print("Next sequence is",self.cid)
 
 
-
-
-#----------------------------------------------------------------- 
-# function gm_user_choice: using dict as an input 
-def gm_user_choice (question_str,next):
-
-  for var in next:
-    print(f"Choice offered {var}: {next[var]}")
-
-  found = False
-  while(not found):
-    user_input = input(question_str).lower()
-    for var in next:
-      if (var == user_input):
-        found = True
-        nout = next[var]
-
-  return(nout)
-
 #-----------------------------------------------------------------
+# A class to manage images
 class Images():
-    """A class to manage images."""
  
     def __init__(self,instance):
         """Initialize settings. """
@@ -208,11 +234,13 @@ class Images():
         # Start each new ship at the bottom center of the screen.
         self.rect.midtop = self.screen_rect.midtop
 
+
     def blitme(self):
         """Draw the ship at its current location."""
         self.screen.blit(self.image, self.rect)
  
 #----------------------------------------------------------------- 
+# A class to manage displaying buttons 
 class Button:
  
     def __init__(self, instance, id, msg, offset):
@@ -249,8 +277,6 @@ class Button:
 
     def check_match(self, mouse):
 
-        print(f"check_match {self.id}, mouse is {mouse}")
-        print(f"check_match {self.id}, l {self.rect.left} r {self.rect.right} b {self.rect.bottom} t {self.rect.top}") 
         if (self.rect.left <= mouse[0] <= self.rect.right
             and self.rect.top <= mouse[1] <= self.rect.bottom):
           ret = True
@@ -261,3 +287,20 @@ class Button:
           print(f"check_match {self.id}, MATCH at {mouse}")
         return (ret)
 
+
+#----------------------------------------------------------------- 
+# Function to manage user input
+def gm_user_choice (question_str, next):
+
+  for var in next:
+    print(f"Choice offered {var}: {next[var]}")
+
+  found = False
+  while(not found):
+    user_input = input(question_str).lower()
+    for var in next:
+      if (var == user_input):
+        found = True
+        nout = next[var]
+
+  return(nout)
