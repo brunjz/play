@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-import pygame, pygame.freetype
-import random, time 
+import pygame
+import pygame.freetype
+import random
+import time
+import sys
 
 from pygame.locals import *
 from trsequences import tr_seq_init 
@@ -72,7 +75,7 @@ class TempleRun:
           # Detect exit code 
           if (self.cid == 's000'):
             print("Leaving the game")
-            quit()
+            sys.exit() 
 
           # Identify current sequence
           found = False
@@ -86,7 +89,7 @@ class TempleRun:
 
           if (not found):
             print(f"Error: sequence {self.cid} not found, exiting") 
-            quit()
+            sys.exit()
 
           # Redraw the screen during each pass through the loop.
           print("Loading image:",seq.img)
@@ -130,7 +133,7 @@ class TempleRun:
           if (seq.method == 'rand'):
             if (len(seq.next) != 2): 
               print("Error, invalid sequence data,exiting")
-              quit()
+              sys.exit()
             rval = random.randint(1,seq.rmax)
             print("rval is",rval)
             if (rval == 1):

@@ -106,6 +106,7 @@ def tr_seq_init(mylist):
 
   # You fight but die because you don't have a weapon
   myseq = Sequence('s151')
+  myseq.img = 'images/killedbydemon.jpg'
   myseq.msg += "You are unarmed so the demon easily defeats you. You are dead. Do you wish to restart? "
   myseq.next = {'yes':'s001','no':'s000'} 
   mylist.append(myseq)
