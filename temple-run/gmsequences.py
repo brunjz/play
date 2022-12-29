@@ -11,9 +11,6 @@ class Sequence():
         self.next = {}
         self.img = 'images/default.jpg' 
 
-    def identify():
-        print(f"Sequence {self.name}: {self.msg}")
-
 #-----------------------------------------------------------------
 # def seq_init 
 def gm_seq_init(mylist):

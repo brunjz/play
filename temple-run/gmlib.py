@@ -10,18 +10,6 @@ from gmsequences import gm_seq_init
 from settings import Settings
 from os.path import exists
 
-#----------------------------------------------------------------- 
-# class Sequence
-class Sequence():
-
-  def __init__(self,id):
-    self.id = id
-    self.msg = ''
-    self.method = 'uinput'
-    self.rmax = 2
-    self.next = {}
-    self.img = 'images/default.jpg'
-
 
 #----------------------------------------------------------------- 
 # Overall class to manage game assets and behavior
@@ -45,11 +33,12 @@ class SequenceManager:
     self.screen = pygame.display.set_mode( 
               (self.settings.screen_width, self.settings.screen_height))
     pygame.display.set_caption(self.settings.set_caption)
-    self.imagectrl = Images(self)
-    self.buttonm = Button(self,"m","b0",0)
-    self.buttonr = Button(self,"r","b+1",1)
-    self.buttonl = Button(self,"l","b-1",-1)
     self.font = pygame.freetype.SysFont("comicsansms", 0) 
+
+    self.imagectrl = Images(self)
+    self.buttonm = Button(self,"m","",0)
+    self.buttonr = Button(self,"r","",1)
+    self.buttonl = Button(self,"l","",-1)
 
 
   #--------------------------------------------------------------- 
@@ -59,9 +48,8 @@ class SequenceManager:
 
 
   #--------------------------------------------------------------- 
-  # Draw text at the bottom of the screen 
+  # Draws text at the bottom of the screen. Basic implementation.
   def draw_text (self, text, text_size, color):
-    """Draw text in the middle of the screen."""
 
     text_rect = self.font.get_rect(text,size=text_size)
     text_rect.bottom = self.screen.get_rect().bottom
@@ -69,10 +57,10 @@ class SequenceManager:
 
 
   #--------------------------------------------------------------- 
-  # Draw text at the bottom of the screen, breaking down long text 
-  # message into small strings.
-  def draw_text_lg (self, text, text_size, color):
-    """Draw text in the middle of the screen."""
+  # Draws text at the bottom of the screen, breaking down long text 
+  # message into small strings. This version is likely to break up
+  # individual words.
+  def draw_text2 (self, text, text_size, color):
 
     mylist = []
     mylist = list(self.chunkstring(text,155))
@@ -87,9 +75,52 @@ class SequenceManager:
       self.font.render_to(self.screen, text_rect2, text2, color, size=text_size)  
       num += 1
 
+
+  #--------------------------------------------------------------- 
+  # Draws text at the bottom of the screen, breaking down long text 
+  # message into smaller test strings. This version does not break
+  # up words.
+
+  def draw_text3 (self, text, text_size, color):
+
+    MAXLEN = 150
+    mylist1 = text.split(' ') 
+    mylist2 = [] 
+    str = ''
+
+    # Captures strings of MAXLEN size into mylist2
+    for tinystr in mylist1:
+      if (len(tinystr) > MAXLEN):
+        sys.exit()
+      elif (len(str) + len(tinystr) < MAXLEN):
+        if (str ==''):
+          str = tinystr
+        else:
+          str = f"{str} {tinystr}"
+      else:
+        mylist2.append(str)
+        str = tinystr 
+
+    # Pushes final string into mylist2 
+    if (len(str) > 0):
+      print(f"draw_text3: pushing '{str}' into list2")
+      mylist2.append(str)
+
+    # Displays message at the bottom of the screen 
+    max = len(mylist2)
+    num = 0
+    while (num < max):
+      text2 = mylist2[num]
+      text_rect2 = self.font.get_rect(text2, size=text_size)
+      text_rect2.bottom = self.screen.get_rect().bottom - 20*(max-num) 
+      text_rect2.left = 10
+      self.font.render_to(self.screen, text_rect2, text2, color, size=text_size)  
+      num += 1
+
+
   #--------------------------------------------------------------- 
   # Check validity of the elements in the sequence list
-  def check_list(self, list):
+  def check_list (self, list):
 
     for seq in list:
 
@@ -136,38 +167,40 @@ class SequenceManager:
             sys.exit()
 
           # Redraw the screen during each pass through the loop.
-          print("Loading image:",seq.img)
           print(seq.msg)
           self.screen.fill(self.settings.bg_color)
-          self.imagectrl.load(self,seq.img)
-          self.imagectrl.blitme()
-          self.draw_text_lg(seq.msg,16,(0,0,0))  
+          self.draw_text3(seq.msg,16,(0,0,0))  
 
-          # Get choice information 
-          choice = []
+          if (exists(seq.img)):
+            print("Loading image:",seq.img)
+            self.imagectrl.load(self,seq.img)
+            self.imagectrl.blitme()
+
+          # Retrieve information from next structure 
+          options = []
           next = []
           for var in seq.next:
-            choice.append(var)
+            options.append(var)
             next.append(seq.next[var])
-          print("Choice",choice)
+          print("Choice",options)
           print("Next",next)
 
-          # Choice to display in box 
-          if (len(choice) == 2):
-            self.buttonl._prep_msg(choice[0])
+          # Determine what to display in the boxes 
+          if (len(options) == 2):
+            self.buttonl.prep_msg(options[0])
             self.buttonl.draw_button()
             next_l = next[0]
-            self.buttonr._prep_msg(choice[1])
+            self.buttonr.prep_msg(options[1])
             self.buttonr.draw_button()
             next_r = next[1]
-          elif (len(choice) == 3):
-            self.buttonl._prep_msg(choice[0])
+          elif (len(options) == 3):
+            self.buttonl.prep_msg(options[0])
             self.buttonl.draw_button()
             next_l = next[0]
-            self.buttonr._prep_msg(choice[2])
+            self.buttonr.prep_msg(options[2])
             self.buttonr.draw_button()
             next_r = next[2]
-            self.buttonm._prep_msg(choice[1])
+            self.buttonm.prep_msg(options[1])
             self.buttonm.draw_button()
             next_m = next[1]
 
@@ -194,14 +227,14 @@ class SequenceManager:
                 if event.type == pygame.QUIT:
                   sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                  print("mouse click detected",mouse)
+                  print("Mouse click detected",mouse)
                   if (self.buttonl.check_match(mouse)): 
                     found = True
                     self.cid = next_l
                   elif (self.buttonr.check_match(mouse)): 
                     found = True
                     self.cid = next_r
-                  elif (self.buttonm.check_match(mouse) and len(choice) == 3): 
+                  elif (self.buttonm.check_match(mouse) and len(options) == 3): 
                     found = True
                     self.cid = next_m
 
@@ -262,18 +295,21 @@ class Button:
         self.rect.centerx += offset*150 
         
         # The button message needs to be prepped only once.
-        self._prep_msg(msg)
+        self.prep_msg(msg)
 
-    def _prep_msg(self, msg):
+
+    def prep_msg(self, msg):
         """Turn msg into a rendered image and center text on the button."""
         self.msg_image = self.font.render(msg, True, self.text_color, self.button_color)
         self.msg_image_rect = self.msg_image.get_rect()
         self.msg_image_rect.center = self.rect.center
 
+
     def draw_button(self):
         # Draw blank button and then draw message.
         self.screen.fill(self.button_color, self.rect)
         self.screen.blit(self.msg_image, self.msg_image_rect)
+
 
     def check_match(self, mouse):
 
@@ -284,7 +320,7 @@ class Button:
           ret = False 
 
         if (ret):
-          print(f"check_match {self.id}, MATCH at {mouse}")
+          print(f"Check_match button {self.id}, MATCH at {mouse}")
         return (ret)
 
 
@@ -293,7 +329,7 @@ class Button:
 def gm_user_choice (question_str, next):
 
   for var in next:
-    print(f"Choice offered {var}: {next[var]}")
+    print(f"Option offered {var}: {next[var]}")
 
   found = False
   while(not found):
@@ -304,3 +340,4 @@ def gm_user_choice (question_str, next):
         nout = next[var]
 
   return(nout)
+
