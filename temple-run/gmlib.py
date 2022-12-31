@@ -58,7 +58,7 @@ class SequenceManager:
 
   #--------------------------------------------------------------- 
   # Draws text at the bottom of the screen, breaking down long text 
-  # message into small strings. This version is likely to break up
+  # message into smaller strings. This version might break up 
   # individual words.
   def draw_text2 (self, text, text_size, color):
 
@@ -78,8 +78,8 @@ class SequenceManager:
 
   #--------------------------------------------------------------- 
   # Draws text at the bottom of the screen, breaking down long text 
-  # message into smaller test strings. This version does not break
-  # up words.
+  # message into smaller test strings. This version won't break up 
+  # words.
 
   def draw_text3 (self, text, text_size, color):
 
@@ -103,7 +103,6 @@ class SequenceManager:
 
     # Pushes final string into mylist2 
     if (len(str) > 0):
-      print(f"draw_text3: pushing '{str}' into list2")
       mylist2.append(str)
 
     # Displays message at the bottom of the screen 
@@ -238,7 +237,6 @@ class SequenceManager:
                     found = True
                     self.cid = next_m
 
-          print("Next sequence is",self.cid)
 
 
 #-----------------------------------------------------------------
