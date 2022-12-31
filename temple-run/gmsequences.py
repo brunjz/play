@@ -8,7 +8,8 @@ class Sequence():
         self.msg = ''
         self.method = 'uinput'
         self.rmax = 2 
-        self.next = {}
+        self.rscreen = '' 
+        self.ret = {}
         self.img = 'images/default.jpg' 
 
 #-----------------------------------------------------------------
