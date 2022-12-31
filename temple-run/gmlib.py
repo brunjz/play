@@ -21,15 +21,16 @@ class SequenceManager:
   def __init__(self):
 
     pygame.init()
+    self.settings = Settings()
 
     # Initiate games sequences
     self.cid = 's001' 
+    self.ret = {} 
     self.list = [] 
     gm_seq_init(self.list)
     self.check_list(self.list)
 
     # Display init 
-    self.settings = Settings()
     self.screen = pygame.display.set_mode( 
               (self.settings.screen_width, self.settings.screen_height))
     pygame.display.set_caption(self.settings.set_caption)
@@ -123,7 +124,7 @@ class SequenceManager:
 
     for seq in list:
 
-      if (len(seq.next) != 2 and len(seq.next) != 3): 
+      if (len(seq.next) != 1 and len(seq.next) != 2 and len(seq.next) != 3): 
         print(f"check_list: invalid entries in dictionary for seq {seq.id}, exiting")
         sys.exit()
 
@@ -162,8 +163,9 @@ class SequenceManager:
               print(f"Entering sequence {seq.id}")
 
           if (not found):
-            print(f"Error: sequence {self.cid} not found, exiting") 
+            print(f"Error: sequence \'{self.cid}\' not found, exiting") 
             sys.exit()
+
 
           # Redraw the screen during each pass through the loop.
           print(seq.msg)
@@ -185,7 +187,11 @@ class SequenceManager:
           print("Next",next)
 
           # Determine what to display in the boxes 
-          if (len(options) == 2):
+          if (len(options) == 1):
+            self.buttonm.prep_msg(options[0])
+            self.buttonm.draw_button()
+            next_m = next[0]
+          elif (len(options) == 2):
             self.buttonl.prep_msg(options[0])
             self.buttonl.draw_button()
             next_l = next[0]
@@ -227,16 +233,27 @@ class SequenceManager:
                   sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                   print("Mouse click detected",mouse)
-                  if (self.buttonl.check_match(mouse)): 
-                    found = True
+                  if (len(seq.rscreen) != 0 and len(self.ret) != 0):
+                    for var in self.ret:
+                      if (var == seq.rscreen): 
+                        print("run_game: return id from return screen identified",self.ret[var])
+                        self.cid = self.ret[var] 
+                        found = True
+                  elif (self.buttonl.check_match(mouse) and len(options) != 1): 
                     self.cid = next_l
-                  elif (self.buttonr.check_match(mouse)): 
                     found = True
+                  elif (self.buttonr.check_match(mouse) and len(options) != 1): 
                     self.cid = next_r
-                  elif (self.buttonm.check_match(mouse) and len(options) == 3): 
                     found = True
+                  elif (self.buttonm.check_match(mouse) and len(options) != 2): 
                     self.cid = next_m
+                    found = True
 
+          # Manage return state 
+          self.ret = {} 
+          if (len(seq.ret) != 0):
+            print(f"Copying return stack from {self.cid}:",seq.ret)
+            self.ret = seq.ret
 
 
 #-----------------------------------------------------------------
