@@ -166,7 +166,6 @@ class SequenceManager:
             print(f"Error: sequence \'{self.cid}\' not found, exiting") 
             sys.exit()
 
-
           # Redraw the screen during each pass through the loop.
           self.screen.fill(self.settings.bg_color)
           self.draw_text3(seq.msg,16,(0,0,0))  
@@ -184,8 +183,8 @@ class SequenceManager:
           for var in seq.next:
             options.append(var)
             next.append(seq.next[var])
-          print("Choice",options)
-          print("Next",next)
+          print("User choices",options)
+          print("Next sequence",next)
 
           # Determine what to display in the boxes 
           if (len(options) == 1):
@@ -218,7 +217,7 @@ class SequenceManager:
               print("Error, invalid sequence data,exiting")
               sys.exit()
             rval = random.randint(1,seq.rmax)
-            print("rval is",rval)
+            print(f"rval is {rval} / rmax is {seq.rmax}")
             if (rval == 1):
               self.cid = next[0]
             else:
