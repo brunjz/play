@@ -168,7 +168,6 @@ class SequenceManager:
 
 
           # Redraw the screen during each pass through the loop.
-          print(seq.msg)
           self.screen.fill(self.settings.bg_color)
           self.draw_text3(seq.msg,16,(0,0,0))  
 
@@ -176,6 +175,8 @@ class SequenceManager:
             print("Loading image:",seq.img)
             self.imagectrl.load(self,seq.img)
             self.imagectrl.blitme()
+
+          print(seq.msg)
 
           # Retrieve information from next structure 
           options = []
@@ -234,11 +235,11 @@ class SequenceManager:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                   print("Mouse click detected",mouse)
                   if (len(seq.rscreen) != 0 and len(self.ret) != 0):
-                    for var in self.ret:
-                      if (var == seq.rscreen): 
-                        print("run_game: return id from return screen identified",self.ret[var])
-                        self.cid = self.ret[var] 
-                        found = True
+                    if seq.rscreen in self.ret.keys():
+                      rid = self.ret[seq.rscreen]
+                      print("run_game: return id from return screen identified",rid)
+                      self.cid = rid 
+                      found = True
                   elif (self.buttonl.check_match(mouse) and len(options) != 1): 
                     self.cid = next_l
                     found = True
